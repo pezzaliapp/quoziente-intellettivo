@@ -1,0 +1,24 @@
+# Credenziali EmailJS — non committare
+config.js
+
+# OS
+.DS_Store
+Thumbs.db
+.localized
+
+# Editor
+.idea/
+.vscode/
+*.swp
+*~
+
+# Dependencies (caso mai si aggiunga node_modules per qualche script)
+node_modules/
+
+# Build artifact temporanei (lo standalone è committato)
+*.tmp
+*.log
+
+# Test runner artifacts
+coverage/
+prompt-claude-code-test-qi.md

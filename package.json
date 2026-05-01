@@ -1,0 +1,11 @@
+{
+  "name": "quoziente-intellettivo",
+  "version": "1.0.0",
+  "description": "Test cognitivo online basato su ICAR-16 (Condon & Revelle, 2014)",
+  "type": "commonjs",
+  "scripts": {
+    "test": "node test/scoring.test.cjs",
+    "serve": "python3 -m http.server 8000"
+  },
+  "license": "CC-BY-SA-4.0"
+}

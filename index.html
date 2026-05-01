@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+  <meta name="description" content="Test cognitivo online basato su ICAR-16 (Condon &amp; Revelle, 2014). Stima del QI con classificazione Wechsler e profilo cognitivo per 4 sottoscale.">
+  <meta name="theme-color" content="#1e1b4b">
+  <title>Quoziente Intellettivo · Test cognitivo ICAR-16</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <main class="app">
+    <header class="app-header">
+      <h1>Quoziente Intellettivo</h1>
+      <span class="badge">ICAR-16 · 2014</span>
+    </header>
+
+    <!-- ───── INTRO ───── -->
+    <section id="intro" class="screen card" aria-labelledby="intro-title">
+      <h2 id="intro-title">Test cognitivo basato su ICAR-16</h2>
+      <p>Una breve batteria di 16 item per stimare il tuo Quoziente Intellettivo. Si basa su uno strumento pubblicato in letteratura scientifica (Condon &amp; Revelle, 2014) e di pubblico dominio.</p>
+
+      <ul class="intro-list">
+        <li><strong>16 domande</strong> divise in 4 sottoscale: ragionamento verbale, serie alfanumeriche, matrici e rotazione 3D</li>
+        <li><strong>Tempo limite: 15 minuti</strong> · puoi tornare indietro prima della consegna</li>
+        <li>Risultato a schermo + opzionale invio del report via email</li>
+        <li>Lingua italiana (i nomi propri inglesi sono mantenuti per fedeltà al test originale)</li>
+      </ul>
+
+      <div class="disclaimer" role="note">
+        <strong>⚠️ Avviso scientifico.</strong> Questo test è una somministrazione online della batteria ICAR-16 (Condon &amp; Revelle, 2014). La traduzione italiana degli item verbali <strong>non è stata oggetto di validazione su campione normativo italiano</strong>. Il punteggio fornito è una <strong>stima del QI</strong> con margine di errore di ±13 punti (intervallo di confidenza 95%).
+        <br><br>
+        <strong>Questo test NON è una valutazione clinica.</strong> Non sostituisce strumenti psicometrici validati (WAIS, WISC, Raven) somministrati da uno psicologo abilitato. In Italia la diagnosi di funzionamento intellettivo è atto riservato agli psicologi iscritti all'Albo (L. 56/89). Per finalità cliniche, scolastiche, lavorative o legali rivolgersi a un professionista.
+      </div>
+
+      <button id="start-btn" class="btn btn-primary" type="button">Inizia il test</button>
+    </section>
+
+    <!-- ───── TEST ───── -->
+    <section id="test" class="screen hidden" aria-labelledby="item-stem">
+      <div class="progress-row">
+        <span id="progress-text">Item 1 / 16</span>
+        <div class="progress-bar"><div id="progress-fill" class="progress-fill" style="width:6%"></div></div>
+        <span class="timer" id="timer">15:00</span>
+      </div>
+      <div class="card">
+        <span class="badge" id="item-subscale">Verbale</span>
+        <h2 id="item-stem" class="item-stem" style="margin-top:14px"></h2>
+        <div id="item-image-wrap" class="item-image-wrap hidden"></div>
+        <div id="options" class="options"></div>
+        <div class="btn-row">
+          <button id="prev-btn" class="btn btn-secondary" type="button">← Indietro</button>
+          <button id="next-btn" class="btn btn-primary" type="button" disabled>Avanti →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───── RESULT ───── -->
+    <section id="result" class="screen hidden" aria-labelledby="result-title">
+      <h2 id="result-title" class="sr-only">Il tuo risultato</h2>
+      <div class="score-hero">
+        <div class="qi-label">QI stimato</div>
+        <div class="qi-number" id="qi-number">--</div>
+        <div class="qi-ci" id="qi-ci"></div>
+        <span class="qi-class" id="qi-class"></span>
+      </div>
+
+      <div id="warning-banner" class="warning-banner hidden" role="alert">
+        <strong>⚠️ Punteggio fuori dal range di misurazione affidabile</strong>
+        <span class="warning-text"></span>
+      </div>
+
+      <div class="card">
+        <p id="qi-percentile"></p>
+        <div class="profile-section">
+          <h3>Profilo cognitivo per sottoscala</h3>
+          <div id="profile-bars"></div>
+          <p style="font-size:0.78rem;color:var(--gray-500);margin-top:14px;">
+            ▲ punto di forza relativo · → in media · ▼ area da rinforzare. La barretta verticale grigia indica la media della popolazione di riferimento.
+          </p>
+        </div>
+
+        <form id="email-form" class="email-form">
+          <label for="email-input">Ricevi il report completo via email (opzionale)</label>
+          <input type="email" id="email-input" placeholder="tu@esempio.it" autocomplete="email" required>
+          <div class="btn-row">
+            <button id="email-btn" type="submit" class="btn btn-primary">Invia report</button>
+          </div>
+          <div id="email-status" class="email-status"></div>
+          <div class="privacy-note">I tuoi dati sono trattati ai sensi del GDPR. L'email è usata solo per inviare il report e non viene condivisa con terzi.</div>
+        </form>
+
+        <div class="btn-row">
+          <button id="restart-btn" class="btn btn-secondary" type="button">↺ Ricomincia</button>
+        </div>
+
+        <div class="disclaimer" style="margin-top:24px;">
+          <strong>Fonte.</strong> Condon, D. M., &amp; Revelle, W. (2014). The international cognitive ability resource: Development and initial validation of a public-domain measure. <em>Intelligence</em>, 43, 52-64. Item rilasciati con licenza Creative Commons. I nomi propri sono mantenuti nella forma originale inglese per fedeltà al test sorgente.
+          <br><br>
+          <strong>Disclaimer.</strong> Stima del QI con margine ±13 punti. Non sostituisce una valutazione clinica. In Italia la diagnosi di funzionamento intellettivo è atto riservato agli psicologi iscritti all'Albo (L. 56/89).
+        </div>
+      </div>
+    </section>
+
+    <footer class="app-footer">
+      <p>Test basato su <a href="https://icar-project.com" target="_blank" rel="noopener">ICAR Project</a> · Condon &amp; Revelle, <em>Intelligence</em> 43, 2014 · Codice sorgente CC BY-SA 4.0</p>
+    </footer>
+  </main>
+
+  <!-- EmailJS CDN (caricato condizionalmente; se assente l'invio email è disabilitato ma il test funziona) -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js" defer></script>
+
+  <!-- Configurazione: copia config.example.js → config.js e compila prima di abilitare l'email -->
+  <script src="config.js" defer></script>
+
+  <!-- Moduli applicativi (in ordine di dipendenza) -->
+  <script src="js/icar_items.js" defer></script>
+  <script src="js/scoring.js" defer></script>
+  <script src="js/email.js" defer></script>
+  <script>
+    // Bridge: scoring.js esporta CommonJS in Node, qui esponiamo i simboli per app.js
+    document.addEventListener('DOMContentLoaded', () => {
+      window.QIScoring = {
+        buildReport: buildReport,
+        rawToIQ: rawToIQ,
+        SUBSCALE_LABEL: SUBSCALE_LABEL
+      };
+      window.ICAR16_ITEMS_DATA = ICAR16_ITEMS;
+    }, { once: true });
+  </script>
+  <script src="js/app.js" defer></script>
+</body>
+</html>

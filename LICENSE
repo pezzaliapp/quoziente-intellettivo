@@ -1,0 +1,38 @@
+Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)
+
+This work is licensed under the Creative Commons Attribution-ShareAlike 4.0
+International License. To view a copy of this license, visit:
+
+    https://creativecommons.org/licenses/by-sa/4.0/
+
+You are free to:
+  - Share — copy and redistribute the material in any medium or format
+  - Adapt — remix, transform, and build upon the material for any purpose,
+    even commercially.
+
+Under the following terms:
+  - Attribution — You must give appropriate credit, provide a link to the
+    license, and indicate if changes were made.
+  - ShareAlike — If you remix, transform, or build upon the material, you
+    must distribute your contributions under the same license as the original.
+
+────────────────────────────────────────────────────────────────────────────
+
+ATTRIBUTION REQUIRED FOR THE TEST CONTENT
+
+The 16 ICAR Sample Test items (text, images, response keys) used in this
+project are derived from:
+
+    Condon, D. M., & Revelle, W. (2014).
+    The international cognitive ability resource: Development and initial
+    validation of a public-domain measure.
+    Intelligence, 43, 52-64.
+    https://doi.org/10.1016/j.intell.2014.01.004
+
+The original ICAR-16 items are released under a Creative Commons license by
+the ICAR Project (https://icar-project.com). Scoring keys were obtained from
+the open-source R package `psychTools::iqitems` maintained by William Revelle
+(https://CRAN.R-project.org/package=psychTools).
+
+When redistributing or building upon this work, please credit both the
+original ICAR authors and this Italian adaptation.
