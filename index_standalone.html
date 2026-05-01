@@ -5,6 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
   <meta name="description" content="Test cognitivo online basato su ICAR-16 (Condon &amp; Revelle, 2014). Stima del QI con classificazione Wechsler e profilo cognitivo per 4 sottoscale.">
   <meta name="theme-color" content="#1e1b4b">
+  <meta name="author" content="Alessandro Pezzali">
+  <!-- Open Graph / firma per condivisione social -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="pezzalihub.app">
+  <meta property="og:title" content="Quoziente Intellettivo · Test cognitivo ICAR-16">
+  <meta property="og:description" content="Stima del QI online basata su ICAR-16 (Condon &amp; Revelle, 2014). 16 item, profilo cognitivo, classificazione Wechsler.">
+  <meta property="og:author" content="https://pezzalihub.app">
+  <meta property="article:author" content="https://pezzalihub.app">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:creator" content="@pezzaliapp">
+  <meta name="twitter:site" content="@pezzaliapp">
   <title>Quoziente Intellettivo · Test ICAR-16 (standalone)</title>
   <style>
 /* Test Cognitivo ICAR-16 — palette: indaco + giallo + bianco. Mobile-first, WCAG AA. */
@@ -272,6 +283,10 @@ footer.app-footer {
   font-size: 0.78rem; color: var(--gray-500); text-align: center;
   border-top: 1px solid var(--gray-100);
 }
+footer.app-footer p { margin: 0; }
+footer.app-footer .author-line {
+  font-size: 0.72rem; margin-top: 6px; opacity: 0.85;
+}
 footer.app-footer a { color: var(--indigo-700); text-decoration: none; }
 footer.app-footer a:hover { text-decoration: underline; }
 
@@ -397,6 +412,7 @@ footer.app-footer a:hover { text-decoration: underline; }
 
     <footer class="app-footer">
       <p>Test basato su <a href="https://icar-project.com" target="_blank" rel="noopener">ICAR Project</a> · Condon &amp; Revelle, <em>Intelligence</em> 43, 2014 · Codice sorgente CC BY-SA 4.0</p>
+      <p class="author-line">Creato da Alessandro Pezzali · <a href="https://pezzalihub.app" target="_blank" rel="noopener">pezzalihub.app</a> · GitHub: <a href="https://github.com/pezzaliapp" target="_blank" rel="noopener">pezzaliapp</a></p>
     </footer>
   </main>
 
@@ -805,6 +821,9 @@ function buildEmailHtml(report, userEmail) {
       <p style="font-size:11px;color:#9ca3af;margin-top:14px;">
         Email inviata a ${userEmail} · I tuoi dati sono trattati ai sensi del GDPR e non condivisi con terzi.
       </p>
+      <p style="font-size:11px;color:#9ca3af;margin-top:8px;text-align:center;border-top:1px solid #f3f4f6;padding-top:12px;">
+        Test sviluppato da Alessandro Pezzali · <a href="https://pezzalihub.app" style="color:#6b7280;text-decoration:none;">pezzalihub.app</a>
+      </p>
     </div>
   </div>`;
 }
@@ -944,6 +963,33 @@ if (typeof module !== 'undefined') {
     }
   }
 
+  // ── Embed mode: postMessage al parent (auto-resize + lifecycle events) ───
+  const isEmbed = !!window.QIEmbedMode && window.parent !== window;
+  let lastEmbedHeight = 0;
+  function postToParent(payload) {
+    if (!isEmbed) return;
+    try { window.parent.postMessage(payload, '*'); } catch (_) {}
+  }
+  function emitHeight() {
+    if (!isEmbed) return;
+    const h = Math.ceil(document.documentElement.scrollHeight);
+    if (Math.abs(h - lastEmbedHeight) >= 2) {
+      lastEmbedHeight = h;
+      postToParent({ type: 'qi:height', value: h });
+    }
+  }
+  if (isEmbed) {
+    document.addEventListener('DOMContentLoaded', () => {
+      if ('ResizeObserver' in window) {
+        new ResizeObserver(() => emitHeight()).observe(document.documentElement);
+      }
+      emitHeight();
+      // safety: alcuni font/immagini ritardano il layout finale
+      setTimeout(emitHeight, 200);
+      setTimeout(emitHeight, 800);
+    }, { once: true });
+  }
+
   // ── Render: intro ────────────────────────────────────────────────────────
   function renderIntro() {
     state.phase = 'intro';
@@ -954,8 +1000,10 @@ if (typeof module !== 'undefined') {
       state.phase = 'test';
       state.startedAt = Date.now();
       saveState();
+      postToParent({ type: 'qi:start' });
       renderItem();
       startTimer();
+      emitHeight();
     };
   }
 
@@ -1035,6 +1083,20 @@ if (typeof module !== 'undefined') {
     state.finishedAt = Date.now();
     saveState();
     renderResult();
+    if (isEmbed) {
+      try {
+        const report = window.QIScoring.buildReport(items, state.answers);
+        postToParent({
+          type: 'qi:complete',
+          iq: report.score.iq,
+          classification: report.score.classification.label,
+          percentile: report.score.percentile,
+          ci95: report.score.ci95,
+          confidence: report.score.confidence
+        });
+      } catch (_) {}
+      emitHeight();
+    }
   }
 
   function renderResult() {
@@ -1109,6 +1171,7 @@ if (typeof module !== 'undefined') {
         status.textContent = '✓ Email inviata. Controlla la posta (anche lo spam).';
         status.className = 'email-status success';
         btn.textContent = 'Inviata';
+        postToParent({ type: 'qi:emailSent' });
       } else {
         status.textContent = '✗ ' + (res.error || 'Errore nell\'invio.');
         status.className = 'email-status error';

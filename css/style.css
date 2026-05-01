@@ -263,6 +263,10 @@ footer.app-footer {
   font-size: 0.78rem; color: var(--gray-500); text-align: center;
   border-top: 1px solid var(--gray-100);
 }
+footer.app-footer p { margin: 0; }
+footer.app-footer .author-line {
+  font-size: 0.72rem; margin-top: 6px; opacity: 0.85;
+}
 footer.app-footer a { color: var(--indigo-700); text-decoration: none; }
 footer.app-footer a:hover { text-decoration: underline; }
 

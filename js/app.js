@@ -96,6 +96,33 @@
     }
   }
 
+  // ── Embed mode: postMessage al parent (auto-resize + lifecycle events) ───
+  const isEmbed = !!window.QIEmbedMode && window.parent !== window;
+  let lastEmbedHeight = 0;
+  function postToParent(payload) {
+    if (!isEmbed) return;
+    try { window.parent.postMessage(payload, '*'); } catch (_) {}
+  }
+  function emitHeight() {
+    if (!isEmbed) return;
+    const h = Math.ceil(document.documentElement.scrollHeight);
+    if (Math.abs(h - lastEmbedHeight) >= 2) {
+      lastEmbedHeight = h;
+      postToParent({ type: 'qi:height', value: h });
+    }
+  }
+  if (isEmbed) {
+    document.addEventListener('DOMContentLoaded', () => {
+      if ('ResizeObserver' in window) {
+        new ResizeObserver(() => emitHeight()).observe(document.documentElement);
+      }
+      emitHeight();
+      // safety: alcuni font/immagini ritardano il layout finale
+      setTimeout(emitHeight, 200);
+      setTimeout(emitHeight, 800);
+    }, { once: true });
+  }
+
   // ── Render: intro ────────────────────────────────────────────────────────
   function renderIntro() {
     state.phase = 'intro';
@@ -106,8 +133,10 @@
       state.phase = 'test';
       state.startedAt = Date.now();
       saveState();
+      postToParent({ type: 'qi:start' });
       renderItem();
       startTimer();
+      emitHeight();
     };
   }
 
@@ -187,6 +216,20 @@
     state.finishedAt = Date.now();
     saveState();
     renderResult();
+    if (isEmbed) {
+      try {
+        const report = window.QIScoring.buildReport(items, state.answers);
+        postToParent({
+          type: 'qi:complete',
+          iq: report.score.iq,
+          classification: report.score.classification.label,
+          percentile: report.score.percentile,
+          ci95: report.score.ci95,
+          confidence: report.score.confidence
+        });
+      } catch (_) {}
+      emitHeight();
+    }
   }
 
   function renderResult() {
@@ -261,6 +304,7 @@
         status.textContent = '✓ Email inviata. Controlla la posta (anche lo spam).';
         status.className = 'email-status success';
         btn.textContent = 'Inviata';
+        postToParent({ type: 'qi:emailSent' });
       } else {
         status.textContent = '✗ ' + (res.error || 'Errore nell\'invio.');
         status.className = 'email-status error';

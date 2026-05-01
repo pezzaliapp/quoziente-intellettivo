@@ -67,14 +67,66 @@ Quindi su GitHub: **Settings → Pages → Build from branch → main, /(root)**
 
 ## 🔌 Embed su pezzalihub.app
 
-Carica `index_standalone.html` come pagina autonoma o iframe:
+Tre modalità a disposizione, scegli quella che ti serve:
+
+### A) Iframe dinamico (consigliato) — `embed.html`
+
+`embed.html` è la versione iframe-ready: layout fluido, sfondo trasparente o scuro, comunicazione `postMessage` col sito ospitante per auto-resize e tracking. Snippet completo da incollare nella pagina pezzalihub.app:
 
 ```html
-<iframe src="https://pezzalihub.app/qi/" width="100%" height="900" loading="lazy"
+<iframe
+  src="https://pezzaliapp.github.io/quoziente-intellettivo/embed.html"
+  width="100%"
+  style="border:0;min-height:600px;"
+  loading="lazy"
+  title="Test Quoziente Intellettivo"
+  id="qi-iframe">
+</iframe>
+<script>
+  window.addEventListener('message', (e) => {
+    if (!e.data || typeof e.data !== 'object') return;
+    if (e.data.type === 'qi:height') {
+      document.getElementById('qi-iframe').style.height = e.data.value + 'px';
+    }
+    // (opzionale) tracking analytics:
+    // if (e.data.type === 'qi:start')      gtag('event', 'qi_start');
+    // if (e.data.type === 'qi:complete')   gtag('event', 'qi_complete', { iq: e.data.iq });
+    // if (e.data.type === 'qi:emailSent')  gtag('event', 'qi_email_sent');
+  });
+</script>
+```
+
+#### Parametri URL supportati
+
+| Parametro | Valore | Effetto |
+|---|---|---|
+| `?bg=transparent` | (default) | Sfondo trasparente, eredita dal parent |
+| `?bg=dark` | | Sfondo indaco scuro `#1e1b4b`, card chiare in evidenza |
+
+#### Eventi `postMessage` emessi
+
+| `type` | Payload | Quando |
+|---|---|---|
+| `qi:height` | `{ value: <px> }` | Ad ogni cambio di altezza del contenuto (auto-resize) |
+| `qi:start` | – | L'utente clicca "Inizia il test" |
+| `qi:complete` | `{ iq, classification, percentile, ci95, confidence }` | Test completato, schermata risultato mostrata |
+| `qi:emailSent` | – | Invio email del report andato a buon fine |
+
+### B) Pagina standalone single-file — `index_standalone.html`
+
+511 KB, autosufficiente (immagini base64, CSS/JS inline). Niente fetch esterni se non EmailJS via CDN. Carica il file dove vuoi:
+
+```html
+<iframe src="https://pezzalihub.app/qi/index_standalone.html"
+        width="100%" height="900" loading="lazy"
         title="Test cognitivo ICAR-16"></iframe>
 ```
 
-Tutto è inline nel file, niente fetch esterni se non EmailJS via CDN (e EmailJS è opzionale).
+Oppure usa direttamente come pagina pubblica.
+
+### C) Test locale
+
+Apri `test_embed.html` nel browser per provare la comunicazione `postMessage`: a sinistra l'iframe, a destra un log live degli eventi ricevuti. Usa i bottoni `default / ?bg=transparent / ?bg=dark` per testare le varianti di sfondo.
 
 ## 📁 Struttura
 
@@ -122,3 +174,7 @@ Gli item ICAR originali sono pubblicati con licenza Creative Commons dall'**ICAR
 - David M. Condon e William Revelle per la creazione e pubblicazione open-source di ICAR-16
 - Il pacchetto R [`psychTools`](https://CRAN.R-project.org/package=psychTools) di Revelle per il chiavi di scoring
 - L'ICAR Project per la distribuzione gratuita degli stimoli
+
+## Autore
+
+[Alessandro Pezzali](https://pezzalihub.app) · [@pezzaliapp](https://github.com/pezzaliapp)

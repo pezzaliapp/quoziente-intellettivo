@@ -3,24 +3,48 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
-  <meta name="description" content="Test cognitivo online basato su ICAR-16 (Condon &amp; Revelle, 2014). Stima del QI con classificazione Wechsler e profilo cognitivo per 4 sottoscale.">
-  <meta name="theme-color" content="#1e1b4b">
+  <meta name="description" content="Test cognitivo ICAR-16 — versione embed iframe-ready.">
   <meta name="author" content="Alessandro Pezzali">
-  <!-- Open Graph / firma per condivisione social -->
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="pezzalihub.app">
-  <meta property="og:title" content="Quoziente Intellettivo · Test cognitivo ICAR-16">
-  <meta property="og:description" content="Stima del QI online basata su ICAR-16 (Condon &amp; Revelle, 2014). 16 item, profilo cognitivo, classificazione Wechsler.">
-  <meta property="og:author" content="https://pezzalihub.app">
-  <meta property="article:author" content="https://pezzalihub.app">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:creator" content="@pezzaliapp">
-  <meta name="twitter:site" content="@pezzaliapp">
-  <title>Quoziente Intellettivo · Test cognitivo ICAR-16</title>
+  <meta name="robots" content="noindex"><!-- l'embed non va indicizzato singolarmente -->
+  <title>Quoziente Intellettivo · embed</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ── Override per il contesto iframe ───────────────────────────────────
+       Manteniamo lo stile del card/UI ma rimuoviamo full-screen e padding
+       eccessivi: il parent decide larghezza/altezza. ───────────────────── */
+    html, body {
+      background: transparent !important;
+      min-height: auto !important;
+    }
+    .app {
+      max-width: 100% !important;
+      padding: 12px 12px 24px !important;
+    }
+    header.app-header {
+      padding-bottom: 10px !important;
+      margin-bottom: 14px !important;
+    }
+    footer.app-footer {
+      margin-top: 24px !important;
+      padding: 12px 0 !important;
+    }
+    /* Variante ?bg=dark — sfondo indaco scuro, card restano chiare */
+    body[data-bg="dark"] {
+      background: var(--indigo-900) !important;
+      color: white;
+    }
+    body[data-bg="dark"] header.app-header h1,
+    body[data-bg="dark"] footer.app-footer,
+    body[data-bg="dark"] footer.app-footer a {
+      color: rgba(255,255,255,0.85);
+    }
+    body[data-bg="dark"] header.app-header { border-bottom-color: rgba(255,255,255,0.15); }
+    body[data-bg="dark"] footer.app-footer { border-top-color: rgba(255,255,255,0.10); }
+    /* Variante ?bg=transparent (default) — niente */
+  </style>
 </head>
 <body>
   <main class="app">
@@ -29,28 +53,22 @@
       <span class="badge">ICAR-16 · 2014</span>
     </header>
 
-    <!-- ───── INTRO ───── -->
+    <!-- INTRO -->
     <section id="intro" class="screen card" aria-labelledby="intro-title">
       <h2 id="intro-title">Test cognitivo basato su ICAR-16</h2>
-      <p>Una breve batteria di 16 item per stimare il tuo Quoziente Intellettivo. Si basa su uno strumento pubblicato in letteratura scientifica (Condon &amp; Revelle, 2014) e di pubblico dominio.</p>
-
+      <p>16 item per stimare il QI. Strumento pubblicato in letteratura scientifica (Condon &amp; Revelle, 2014) e di pubblico dominio.</p>
       <ul class="intro-list">
-        <li><strong>16 domande</strong> divise in 4 sottoscale: ragionamento verbale, serie alfanumeriche, matrici e rotazione 3D</li>
-        <li><strong>Tempo limite: 15 minuti</strong> · puoi tornare indietro prima della consegna</li>
-        <li>Risultato a schermo + opzionale invio del report via email</li>
-        <li>Lingua italiana (i nomi propri inglesi sono mantenuti per fedeltà al test originale)</li>
+        <li><strong>16 domande</strong> in 4 sottoscale: verbale, serie, matrici, rotazione 3D</li>
+        <li><strong>Tempo limite: 15 minuti</strong> · si può tornare indietro</li>
+        <li>Risultato a schermo + invio opzionale del report via email</li>
       </ul>
-
       <div class="disclaimer" role="note">
-        <strong>⚠️ Avviso scientifico.</strong> Questo test è una somministrazione online della batteria ICAR-16 (Condon &amp; Revelle, 2014). La traduzione italiana degli item verbali <strong>non è stata oggetto di validazione su campione normativo italiano</strong>. Il punteggio fornito è una <strong>stima del QI</strong> con margine di errore di ±13 punti (intervallo di confidenza 95%).
-        <br><br>
-        <strong>Questo test NON è una valutazione clinica.</strong> Non sostituisce strumenti psicometrici validati (WAIS, WISC, Raven) somministrati da uno psicologo abilitato. In Italia la diagnosi di funzionamento intellettivo è atto riservato agli psicologi iscritti all'Albo (L. 56/89). Per finalità cliniche, scolastiche, lavorative o legali rivolgersi a un professionista.
+        <strong>⚠️ Avviso scientifico.</strong> Stima del QI con margine di errore di ±13 punti (95% CI). Traduzione italiana non validata su campione normativo italiano. <strong>Non sostituisce una valutazione clinica.</strong> In Italia la diagnosi del funzionamento intellettivo è atto riservato agli psicologi iscritti all'Albo (L. 56/89).
       </div>
-
       <button id="start-btn" class="btn btn-primary" type="button">Inizia il test</button>
     </section>
 
-    <!-- ───── TEST ───── -->
+    <!-- TEST -->
     <section id="test" class="screen hidden" aria-labelledby="item-stem">
       <div class="progress-row">
         <span id="progress-text">Item 1 / 16</span>
@@ -69,7 +87,7 @@
       </div>
     </section>
 
-    <!-- ───── RESULT ───── -->
+    <!-- RESULT -->
     <section id="result" class="screen hidden" aria-labelledby="result-title">
       <h2 id="result-title" class="sr-only">Il tuo risultato</h2>
       <div class="score-hero">
@@ -78,22 +96,19 @@
         <div class="qi-ci" id="qi-ci"></div>
         <span class="qi-class" id="qi-class"></span>
       </div>
-
       <div id="warning-banner" class="warning-banner hidden" role="alert">
         <strong>⚠️ Punteggio fuori dal range di misurazione affidabile</strong>
         <span class="warning-text"></span>
       </div>
-
       <div class="card">
         <p id="qi-percentile"></p>
         <div class="profile-section">
           <h3>Profilo cognitivo per sottoscala</h3>
           <div id="profile-bars"></div>
           <p style="font-size:0.78rem;color:var(--gray-500);margin-top:14px;">
-            ▲ punto di forza relativo · → in media · ▼ area da rinforzare. La barretta verticale grigia indica la media della popolazione di riferimento.
+            ▲ punto di forza · → in media · ▼ area da rinforzare. La barretta verticale grigia indica la media della popolazione.
           </p>
         </div>
-
         <form id="email-form" class="email-form">
           <label for="email-input">Ricevi il report completo via email (opzionale)</label>
           <input type="email" id="email-input" placeholder="tu@esempio.it" autocomplete="email" required>
@@ -103,37 +118,41 @@
           <div id="email-status" class="email-status"></div>
           <div class="privacy-note">I tuoi dati sono trattati ai sensi del GDPR. L'email è usata solo per inviare il report e non viene condivisa con terzi.</div>
         </form>
-
         <div class="btn-row">
           <button id="restart-btn" class="btn btn-secondary" type="button">↺ Ricomincia</button>
         </div>
-
         <div class="disclaimer" style="margin-top:24px;">
-          <strong>Fonte.</strong> Condon, D. M., &amp; Revelle, W. (2014). The international cognitive ability resource: Development and initial validation of a public-domain measure. <em>Intelligence</em>, 43, 52-64. Item rilasciati con licenza Creative Commons. I nomi propri sono mantenuti nella forma originale inglese per fedeltà al test sorgente.
+          <strong>Fonte.</strong> Condon &amp; Revelle (2014), <em>Intelligence</em> 43, 52-64. Item ICAR rilasciati con licenza Creative Commons.
           <br><br>
-          <strong>Disclaimer.</strong> Stima del QI con margine ±13 punti. Non sostituisce una valutazione clinica. In Italia la diagnosi di funzionamento intellettivo è atto riservato agli psicologi iscritti all'Albo (L. 56/89).
+          <strong>Disclaimer.</strong> Stima del QI con margine ±13 punti. Non sostituisce una valutazione clinica.
         </div>
       </div>
     </section>
 
     <footer class="app-footer">
-      <p>Test basato su <a href="https://icar-project.com" target="_blank" rel="noopener">ICAR Project</a> · Condon &amp; Revelle, <em>Intelligence</em> 43, 2014 · Codice sorgente CC BY-SA 4.0</p>
+      <p>Test basato su <a href="https://icar-project.com" target="_blank" rel="noopener">ICAR Project</a> · Codice CC BY-SA 4.0</p>
       <p class="author-line">Creato da Alessandro Pezzali · <a href="https://pezzalihub.app" target="_blank" rel="noopener">pezzalihub.app</a> · GitHub: <a href="https://github.com/pezzaliapp" target="_blank" rel="noopener">pezzaliapp</a></p>
     </footer>
   </main>
 
-  <!-- EmailJS CDN (caricato condizionalmente; se assente l'invio email è disabilitato ma il test funziona) -->
+  <!-- Embed mode: leggi parametro ?bg=... e abilita postMessage in app.js -->
+  <script>
+    (function () {
+      const p = new URLSearchParams(location.search);
+      const bg = p.get('bg');
+      if (bg === 'dark' || bg === 'transparent') {
+        document.body.setAttribute('data-bg', bg);
+      }
+      window.QIEmbedMode = true;
+    })();
+  </script>
+
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js" defer></script>
-
-  <!-- Configurazione: copia config.example.js → config.js e compila prima di abilitare l'email -->
   <script src="config.js" defer></script>
-
-  <!-- Moduli applicativi (in ordine di dipendenza) -->
   <script src="js/icar_items.js" defer></script>
   <script src="js/scoring.js" defer></script>
   <script src="js/email.js" defer></script>
   <script>
-    // Bridge: scoring.js esporta CommonJS in Node, qui esponiamo i simboli per app.js
     document.addEventListener('DOMContentLoaded', () => {
       window.QIScoring = {
         buildReport: buildReport,

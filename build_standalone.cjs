@@ -29,6 +29,26 @@ const inlineImages = {
   'R3D.08': 'data:image/jpeg;base64,' + b64('assets/R3D_08.jpg')
 };
 
+// Se config.js esiste in locale, ne preserviamo le credenziali EmailJS nello standalone.
+// Altrimenti restano i placeholder INSERIRE_QUI.
+const creds = {
+  EMAILJS_PUBLIC_KEY:  'INSERIRE_QUI',
+  EMAILJS_SERVICE_ID:  'INSERIRE_QUI',
+  EMAILJS_TEMPLATE_ID: 'INSERIRE_QUI',
+  EMAILJS_REPLY_TO:    ''
+};
+try {
+  const cfgRaw = r('config.js');
+  const re = /EMAILJS_(\w+):\s*'([^']*)'/g;
+  let m;
+  while ((m = re.exec(cfgRaw)) !== null) {
+    creds['EMAILJS_' + m[1]] = m[2];
+  }
+  console.log('✓ credenziali EmailJS lette da config.js');
+} catch (_) {
+  console.log('⚠ config.js assente — uso placeholder INSERIRE_QUI');
+}
+
 let html = indexHtml;
 
 // 1. Inline CSS
@@ -52,10 +72,10 @@ const inlinedScripts = `
   <!-- Configurazione EmailJS: sostituire i valori sotto prima di pubblicare -->
   <script>
     window.QIConfig = {
-      EMAILJS_PUBLIC_KEY:  'INSERIRE_QUI',
-      EMAILJS_SERVICE_ID:  'INSERIRE_QUI',
-      EMAILJS_TEMPLATE_ID: 'INSERIRE_QUI',
-      EMAILJS_REPLY_TO:    ''
+      EMAILJS_PUBLIC_KEY:  '${creds.EMAILJS_PUBLIC_KEY}',
+      EMAILJS_SERVICE_ID:  '${creds.EMAILJS_SERVICE_ID}',
+      EMAILJS_TEMPLATE_ID: '${creds.EMAILJS_TEMPLATE_ID}',
+      EMAILJS_REPLY_TO:    '${creds.EMAILJS_REPLY_TO}'
     };
     window.QIInlineImages = ${JSON.stringify(inlineImages)};
   </script>

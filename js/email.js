@@ -71,6 +71,9 @@ function buildEmailHtml(report, userEmail) {
       <p style="font-size:11px;color:#9ca3af;margin-top:14px;">
         Email inviata a ${userEmail} · I tuoi dati sono trattati ai sensi del GDPR e non condivisi con terzi.
       </p>
+      <p style="font-size:11px;color:#9ca3af;margin-top:8px;text-align:center;border-top:1px solid #f3f4f6;padding-top:12px;">
+        Test sviluppato da Alessandro Pezzali · <a href="https://pezzalihub.app" style="color:#6b7280;text-decoration:none;">pezzalihub.app</a>
+      </p>
     </div>
   </div>`;
 }
