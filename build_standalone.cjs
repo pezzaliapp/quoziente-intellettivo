@@ -51,10 +51,16 @@ try {
 
 let html = indexHtml;
 
+// NB: usiamo SEMPRE callback come secondo argomento di .replace().
+// Il problema: con replacement-string, '$$' viene interpretato come '$'
+// letterale (escape MDN). app.js contiene `const $$ = ...` e finiva
+// scritto come `const $ = ...` nel bundle, generando "Identifier '$'
+// already declared". Le callback non subiscono questa sostituzione.
+
 // 1. Inline CSS
 html = html.replace(
   /<link rel="stylesheet" href="css\/style\.css">/,
-  `<style>\n${css}\n</style>`
+  () => `<style>\n${css}\n</style>`
 );
 
 // 2. Rimuovi font Google (offline-first); fallback su system font
@@ -85,14 +91,15 @@ const inlinedScripts = `
   <script>${appJs}</script>
 `;
 // Inseriamo il bundle subito prima del </body>
-html = html.replace('</body>', inlinedScripts + '\n</body>');
+// (callback obbligatoria: vedi nota sopra su '$$' nelle replacement-string)
+html = html.replace('</body>', () => inlinedScripts + '\n</body>');
 
 // 4. Rimuovi il bridge che ora è inutile (ma se rimasto, va bene comunque)
 
 // 5. Adatta titolo standalone
 html = html.replace(
   /<title>[^<]*<\/title>/,
-  '<title>Quoziente Intellettivo · Test ICAR-16 (standalone)</title>'
+  () => '<title>Quoziente Intellettivo · Test ICAR-16 (standalone)</title>'
 );
 
 fs.writeFileSync(path.join(ROOT, 'index_standalone.html'), html, 'utf8');

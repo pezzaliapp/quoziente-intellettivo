@@ -921,10 +921,10 @@ if (typeof module !== 'undefined') {
 
   // ── Render helpers ──────────────────────────────────────────────────────
   const $ = sel => document.querySelector(sel);
-  const $ = sel => Array.from(document.querySelectorAll(sel));
+  const $$ = sel => Array.from(document.querySelectorAll(sel));
 
   function show(screenId) {
-    $('.screen').forEach(el => el.classList.add('hidden'));
+    $$('.screen').forEach(el => el.classList.add('hidden'));
     $('#' + screenId).classList.remove('hidden');
   }
 
@@ -1050,7 +1050,7 @@ if (typeof module !== 'undefined') {
       if (ev.target && ev.target.name === 'opt') {
         state.answers[item.id] = parseInt(ev.target.value, 10);
         saveState();
-        $('.option').forEach(el => el.classList.toggle(
+        $$('.option').forEach(el => el.classList.toggle(
           'selected',
           el.querySelector('input').checked
         ));
