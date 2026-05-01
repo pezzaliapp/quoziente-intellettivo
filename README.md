@@ -69,13 +69,15 @@ Quindi su GitHub: **Settings → Pages → Build from branch → main, /(root)**
 
 Tre modalità a disposizione, scegli quella che ti serve:
 
-### A) Iframe dinamico (consigliato) — `embed.html`
+### A) Iframe dinamico (consigliato) — `embed_standalone.html`
 
-`embed.html` è la versione iframe-ready: layout fluido, sfondo trasparente o scuro, comunicazione `postMessage` col sito ospitante per auto-resize e tracking. Snippet completo da incollare nella pagina pezzalihub.app:
+Versione iframe-ready con tutto inline (CSS, JS, immagini, credenziali EmailJS). Layout fluido, sfondo trasparente o scuro, comunicazione `postMessage` col sito ospitante per auto-resize e tracking. **Niente `config.js` esterno**, quindi non c'è il rischio di "EmailJS non configurato" che si avrebbe con `embed.html` modulare se deployato senza `config.js`.
+
+Snippet completo da incollare nella pagina che ospita l'iframe:
 
 ```html
 <iframe
-  src="https://pezzaliapp.github.io/quoziente-intellettivo/embed.html"
+  src="https://www.alessandropezzali.it/quoziente-intellettivo/embed_standalone.html"
   width="100%"
   style="border:0;min-height:600px;"
   loading="lazy"
@@ -84,17 +86,21 @@ Tre modalità a disposizione, scegli quella che ti serve:
 </iframe>
 <script>
   window.addEventListener('message', (e) => {
-    if (!e.data || typeof e.data !== 'object') return;
-    if (e.data.type === 'qi:height') {
+    if (e.data?.type === 'qi:height')
       document.getElementById('qi-iframe').style.height = e.data.value + 'px';
-    }
     // (opzionale) tracking analytics:
-    // if (e.data.type === 'qi:start')      gtag('event', 'qi_start');
-    // if (e.data.type === 'qi:complete')   gtag('event', 'qi_complete', { iq: e.data.iq });
-    // if (e.data.type === 'qi:emailSent')  gtag('event', 'qi_email_sent');
+    // if (e.data?.type === 'qi:start')      gtag('event', 'qi_start');
+    // if (e.data?.type === 'qi:complete')   gtag('event', 'qi_complete', { iq: e.data.iq });
+    // if (e.data?.type === 'qi:emailSent')  gtag('event', 'qi_email_sent');
   });
 </script>
 ```
+
+> URL alternativo (mirror su GitHub Pages): `https://pezzaliapp.github.io/quoziente-intellettivo/embed_standalone.html`
+
+#### `embed.html` modulare (solo per dev locale)
+
+`embed.html` (versione modulare) carica `config.js` esterno e i moduli `js/*.js` separati. Va bene in dev (`python3 -m http.server`), **non** per il deploy pubblico — `config.js` è in `.gitignore`. Per il deploy si usa sempre `embed_standalone.html`.
 
 #### Parametri URL supportati
 

@@ -1,8 +1,19 @@
 #!/usr/bin/env node
 /**
- * Genera index_standalone.html — versione single-file con tutto inline:
- * CSS, JS, immagini base64. Pensato per embed su pezzalihub.app o uso
- * offline senza dipendenze esterne (ad esclusione di EmailJS via CDN).
+ * Genera le versioni single-file (tutto inline) dei due entry HTML:
+ *
+ *   index.html  →  index_standalone.html        (pagina autonoma)
+ *   embed.html  →  embed_standalone.html        (iframe-ready, postMessage)
+ *
+ * Pensati per essere caricati senza dipendenze esterne ad eccezione
+ * di EmailJS via CDN. CSS/JS/immagini base64 e credenziali EmailJS
+ * inline (lette da config.js, locale e non versionato).
+ *
+ * NB: usiamo SEMPRE callback come secondo argomento di .replace().
+ * Con replacement-string, '$$' viene interpretato come '$' letterale
+ * (escape MDN). app.js contiene `const $$ = ...` e finiva scritto come
+ * `const $ = ...` nel bundle, generando "Identifier '$' already declared".
+ * Le callback NON subiscono questa sostituzione.
  */
 const fs = require('fs');
 const path = require('path');
@@ -16,7 +27,6 @@ const itemsJs   = r('js/icar_items.js');
 const scoringJs = r('js/scoring.js');
 const emailJs   = r('js/email.js');
 const appJs     = r('js/app.js');
-const indexHtml = r('index.html');
 
 const inlineImages = {
   'MR.45':  'data:image/jpeg;base64,' + b64('assets/MR_45.jpg'),
@@ -49,31 +59,6 @@ try {
   console.log('⚠ config.js assente — uso placeholder INSERIRE_QUI');
 }
 
-let html = indexHtml;
-
-// NB: usiamo SEMPRE callback come secondo argomento di .replace().
-// Il problema: con replacement-string, '$$' viene interpretato come '$'
-// letterale (escape MDN). app.js contiene `const $$ = ...` e finiva
-// scritto come `const $ = ...` nel bundle, generando "Identifier '$'
-// already declared". Le callback non subiscono questa sostituzione.
-
-// 1. Inline CSS
-html = html.replace(
-  /<link rel="stylesheet" href="css\/style\.css">/,
-  () => `<style>\n${css}\n</style>`
-);
-
-// 2. Rimuovi font Google (offline-first); fallback su system font
-html = html.replace(/<link rel="preconnect"[^>]*>\s*/g, '');
-html = html.replace(/<link href="https:\/\/fonts\.googleapis[^"]*"[^>]*>\s*/, '');
-
-// 3. Rimuovi i 4 <script src="js/..."> e config.js, sostituiscili con un blocco inline
-html = html.replace(/<script src="config\.js"[^>]*><\/script>\s*/, '');
-html = html.replace(/<script src="js\/icar_items\.js"[^>]*><\/script>\s*/, '');
-html = html.replace(/<script src="js\/scoring\.js"[^>]*><\/script>\s*/, '');
-html = html.replace(/<script src="js\/email\.js"[^>]*><\/script>\s*/, '');
-html = html.replace(/<script src="js\/app\.js"[^>]*><\/script>\s*/, '');
-
 const inlinedScripts = `
   <!-- Configurazione EmailJS: sostituire i valori sotto prima di pubblicare -->
   <script>
@@ -90,18 +75,53 @@ const inlinedScripts = `
   <script>${emailJs}</script>
   <script>${appJs}</script>
 `;
-// Inseriamo il bundle subito prima del </body>
-// (callback obbligatoria: vedi nota sopra su '$$' nelle replacement-string)
-html = html.replace('</body>', () => inlinedScripts + '\n</body>');
 
-// 4. Rimuovi il bridge che ora è inutile (ma se rimasto, va bene comunque)
+/**
+ * Trasforma un entry HTML modulare in versione single-file inline.
+ * @param {string} sourceFile   es. 'index.html' o 'embed.html'
+ * @param {string} outFile      es. 'index_standalone.html'
+ * @param {string} title        nuovo <title> da iniettare
+ */
+function buildStandalone(sourceFile, outFile, title) {
+  let html = r(sourceFile);
 
-// 5. Adatta titolo standalone
-html = html.replace(
-  /<title>[^<]*<\/title>/,
-  () => '<title>Quoziente Intellettivo · Test ICAR-16 (standalone)</title>'
+  // 1. Inline CSS (path relativo allo stesso file)
+  html = html.replace(
+    /<link rel="stylesheet" href="css\/style\.css">/,
+    () => `<style>\n${css}\n</style>`
+  );
+
+  // 2. Rimuovi link a Google Fonts (lo standalone deve funzionare offline)
+  html = html.replace(/<link rel="preconnect"[^>]*>\s*/g, '');
+  html = html.replace(/<link href="https:\/\/fonts\.googleapis[^"]*"[^>]*>\s*/, '');
+
+  // 3. Rimuovi i 4 <script src="js/..."> + config.js, saranno re-iniettati inline
+  html = html.replace(/<script src="config\.js"[^>]*><\/script>\s*/, '');
+  html = html.replace(/<script src="js\/icar_items\.js"[^>]*><\/script>\s*/, '');
+  html = html.replace(/<script src="js\/scoring\.js"[^>]*><\/script>\s*/, '');
+  html = html.replace(/<script src="js\/email\.js"[^>]*><\/script>\s*/, '');
+  html = html.replace(/<script src="js\/app\.js"[^>]*><\/script>\s*/, '');
+
+  // 4. Inserisci il bundle inline subito prima del </body>
+  //    (callback obbligatoria: vedi nota sopra su '$$' nelle replacement-string)
+  html = html.replace('</body>', () => inlinedScripts + '\n</body>');
+
+  // 5. Adatta <title>
+  html = html.replace(/<title>[^<]*<\/title>/, () => `<title>${title}</title>`);
+
+  fs.writeFileSync(path.join(ROOT, outFile), html, 'utf8');
+  const sizeKB = (fs.statSync(path.join(ROOT, outFile)).size / 1024).toFixed(1);
+  console.log(`✓ ${outFile} generato (${sizeKB} KB)`);
+}
+
+// ── Genera i due artefatti ──────────────────────────────────────────────
+buildStandalone(
+  'index.html',
+  'index_standalone.html',
+  'Quoziente Intellettivo · Test ICAR-16 (standalone)'
 );
-
-fs.writeFileSync(path.join(ROOT, 'index_standalone.html'), html, 'utf8');
-const sizeKB = (fs.statSync(path.join(ROOT, 'index_standalone.html')).size / 1024).toFixed(1);
-console.log(`✓ index_standalone.html generato (${sizeKB} KB)`);
+buildStandalone(
+  'embed.html',
+  'embed_standalone.html',
+  'Quoziente Intellettivo · embed (standalone)'
+);
